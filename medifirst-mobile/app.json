@@ -1,0 +1,37 @@
+{
+  "expo": {
+    "name": "MediFirst",
+    "slug": "medifirst-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "newArchEnabled": true,
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.medifirst.app"
+    },
+    "android": {
+      "package": "com.medifirst.app",
+      "adaptiveIcon": {
+        "backgroundColor": "#e74c3c"
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow MediFirst to use your location for emergency services."
+        }
+      ],
+      "expo-video"
+    ]
+  }
+}
