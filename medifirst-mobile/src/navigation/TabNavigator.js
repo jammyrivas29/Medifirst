@@ -77,14 +77,11 @@ function GuestStack() {
           headerTintColor: '#fff',
         }}
       />
+      {/* headerShown: false → HospitalLocatorScreen's own green header shows, no duplicate bar */}
       <Stack.Screen
         name="Hospital"
         component={HospitalLocatorScreen}
-        options={{
-          title: 'Hospitals',
-          headerStyle: { backgroundColor: '#e74c3c' },
-          headerTintColor: '#fff',
-        }}
+        options={{ headerShown: false }}
       />
     </Stack.Navigator>
   );

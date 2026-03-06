@@ -35,7 +35,7 @@ export const CPR_MODES = {
     details: ['Use 2 hands', 'Push 2 inches deep', '30 compressions : 2 breaths'],
     steps: [
       { stepNumber: 1, title: 'Check the Scene', description: 'Make sure the scene is safe for you and the victim. Look for hazards before approaching.', image: require('../../../assets/guides/cpr/step1cpr.jpg') },
-      { stepNumber: 2, title: 'Check for Unresponsiveness', description: 'Shake the victim\'s shoulders and loudly ask "Are you okay?" If no response, check for breathing and pulse at the carotid artery next to the windpipe just below the jaw.', image: require('../../../assets/guides/cpr/cpr1.jpg') },
+      { stepNumber: 2, title: 'Check for Unresponsiveness', description: 'Check for breathing and pulse at the carotid artery next to the windpipe just below the jaw.', image: require('../../../assets/guides/cpr/cpr1.jpg') },
       { stepNumber: 3, title: 'Call Emergency Services', description: 'Call 911 or the local emergency number immediately, or ask someone nearby to call.', image: require('../../../assets/guides/cpr/cpr2.jpg') },
       { stepNumber: 4, title: 'Keep the Victim on Their Back', description: 'Ensure the victim is lying flat on their back on a firm, flat surface to allow effective compressions.', image: require('../../../assets/guides/cpr/cpr3.jpg') },
       { stepNumber: 5, title: 'Give 30 Chest Compressions', description: 'Push hard and fast in the center of the chest with 2 hands. Give 30 compressions at 100–120 per minute, at least 2 inches deep.', image: require('../../../assets/guides/cpr/cpr4.jpg') },

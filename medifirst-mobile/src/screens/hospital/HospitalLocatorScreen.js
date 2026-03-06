@@ -14,26 +14,6 @@ const OVERPASS_SERVERS = [
   'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
 ];
 
-const KNOWN_HOSPITALS = [
-  { keywords: ['cebu doctors'],           phone: '032-255-5555' },
-  { keywords: ['chong hua'],              phone: '032-255-8000' },
-  { keywords: ['vicente sotto', 'vsmmc'], phone: '032-253-9891' },
-  { keywords: ['perpetual succour'],      phone: '032-233-8620' },
-  { keywords: ['cebu south'],             phone: '032-888-2000' },
-  { keywords: ['cebu city medical'],      phone: '032-255-1423' },
-  { keywords: ['brokenshire'],            phone: '082-221-1993' },
-  { keywords: ['sacred heart'],           phone: '032-253-3355' },
-];
-
-function lookupPhone(name) {
-  if (!name) return null;
-  const lower = name.toLowerCase();
-  for (const h of KNOWN_HOSPITALS) {
-    if (h.keywords.some(kw => lower.includes(kw))) return h.phone;
-  }
-  return null;
-}
-
 function formatDistance(m) {
   if (!m && m !== 0) return 'Nearby';
   return m < 1000 ? `${Math.round(m)} m away` : `${(m / 1000).toFixed(1)} km away`;
@@ -67,12 +47,11 @@ function parseElements(elements) {
       const lon  = el.lon ?? el.center?.lon;
       const tags = el.tags || {};
       const name = tags.name || tags['name:en'] || null;
-      const osmPhone = tags.phone || tags['contact:phone'] || null;
       return {
         id: el.id.toString(),
         name,
         address: buildAddress(tags),
-        phone: osmPhone || lookupPhone(name),
+        phone: tags.phone || tags['contact:phone'] || null,
         lat,
         lng: lon,
       };
@@ -80,25 +59,20 @@ function parseElements(elements) {
     .filter(h => h.lat && h.lng && h.name);
 }
 
-// ── Race all 3 servers — use whichever responds first ────────────────────────
 async function fetchNearbyHospitals(latitude, longitude) {
   const query = `[out:json][timeout:10];(node["amenity"="hospital"](around:${SEARCH_RADIUS},${latitude},${longitude});way["amenity"="hospital"](around:${SEARCH_RADIUS},${latitude},${longitude}););out center;`;
-
   const tryServer = (server) =>
     fetch(server, {
       method: 'POST',
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
       body: `data=${encodeURIComponent(query)}`,
-    })
-      .then(async (res) => {
-        const text = await res.text();
-        if (!text.trim().startsWith('{')) throw new Error('Non-JSON response');
-        const data = JSON.parse(text);
-        if (!data.elements) throw new Error('No elements');
-        return parseElements(data.elements);
-      });
-
-  // Promise.any — resolves with first successful response
+    }).then(async (res) => {
+      const text = await res.text();
+      if (!text.trim().startsWith('{')) throw new Error('Non-JSON response');
+      const data = JSON.parse(text);
+      if (!data.elements) throw new Error('No elements');
+      return parseElements(data.elements);
+    });
   try {
     return await Promise.any(OVERPASS_SERVERS.map(tryServer));
   } catch {
@@ -106,15 +80,12 @@ async function fetchNearbyHospitals(latitude, longitude) {
   }
 }
 
-// ─────────────────────────────────────────────
-// Main Screen
-// ─────────────────────────────────────────────
 export default function HospitalLocatorScreen() {
-  const [location,  setLocation]  = useState(null);
-  const [hospitals, setHospitals] = useState([]);
-  const [loading,   setLoading]   = useState(true);
+  const [location,   setLocation]   = useState(null);
+  const [hospitals,  setHospitals]  = useState([]);
+  const [loading,    setLoading]    = useState(true);
   const [loadingMsg, setLoadingMsg] = useState('Getting your location…');
-  const [error,     setError]     = useState(null);
+  const [error,      setError]      = useState(null);
 
   useEffect(() => { initLocation(); }, []);
 
@@ -123,7 +94,6 @@ export default function HospitalLocatorScreen() {
     setError(null);
     setHospitals([]);
     setLoadingMsg('Getting your location…');
-
     try {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
@@ -131,25 +101,15 @@ export default function HospitalLocatorScreen() {
         setLoading(false);
         return;
       }
-
-      // ✅ Balanced accuracy = ~1 sec instead of 5-15 sec with High
-      const loc = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.Balanced,
-      });
+      const loc = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
       const coords = { latitude: loc.coords.latitude, longitude: loc.coords.longitude };
       setLocation(coords);
       setLoadingMsg('Searching nearby hospitals…');
-
       const results = await fetchNearbyHospitals(coords.latitude, coords.longitude);
-
       const withDistance = results
-        .map(h => ({
-          ...h,
-          distanceMeters: getDistanceMeters(coords.latitude, coords.longitude, h.lat, h.lng),
-        }))
+        .map(h => ({ ...h, distanceMeters: getDistanceMeters(coords.latitude, coords.longitude, h.lat, h.lng) }))
         .sort((a, b) => a.distanceMeters - b.distanceMeters)
         .slice(0, 20);
-
       setHospitals(withDistance);
     } catch (err) {
       setError(err.message);
@@ -176,14 +136,10 @@ export default function HospitalLocatorScreen() {
   const openAllOnMap = () => {
     if (location) {
       const { latitude, longitude } = location;
-      // Search "hospitals near me" centered exactly on user's coordinates at street level
-      Linking.openURL(
-        `https://www.google.com/maps/search/hospitals/@${latitude},${longitude},15z/data=!3m1!4b1`
-      );
+      Linking.openURL(`https://www.google.com/maps/search/hospitals/@${latitude},${longitude},15z/data=!3m1!4b1`);
     }
   };
 
-  // ── Loading ──
   if (loading) {
     return (
       <View style={styles.center}>
@@ -200,10 +156,7 @@ export default function HospitalLocatorScreen() {
           </View>
         </SafeAreaView>
         <View style={styles.loadingBody}>
-          <View style={styles.loadingIconWrap}>
-            <Ionicons name="medical" size={32} color="#e74c3c" />
-          </View>
-          <ActivityIndicator size="large" color="#e74c3c" style={{ marginTop: 16 }} />
+          <ActivityIndicator size="large" color="#27ae60" />
           <Text style={styles.loadingTitle}>Finding Nearby Hospitals</Text>
           <Text style={styles.loadingSubtitle}>{loadingMsg}</Text>
         </View>
@@ -214,7 +167,6 @@ export default function HospitalLocatorScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
 
-      {/* ══ HEADER ══ */}
       <SafeAreaView style={styles.header}>
         {Platform.OS === 'android' && <View style={{ height: StatusBar.currentHeight || 0 }} />}
         <View style={styles.headerInner}>
@@ -232,13 +184,12 @@ export default function HospitalLocatorScreen() {
         </View>
       </SafeAreaView>
 
-      {/* ── Stats Row ── */}
       <View style={styles.statsRow}>
         {[
-          { num: hospitals.length || '—',     label: 'Found',    icon: 'business',         color: '#27ae60' },
-          { num: `${SEARCH_RADIUS/1000}km`,   label: 'Radius',   icon: 'radio-button-on',  color: '#2980b9' },
-          { num: 'Free',                       label: 'No Key',   icon: 'shield-checkmark', color: '#8e44ad' },
-          { num: 'Live',                       label: 'Real Data',icon: 'checkmark-done',   color: '#e74c3c' },
+          { num: hospitals.length || '—',   label: 'Found',     icon: 'business',         color: '#27ae60' },
+          { num: `${SEARCH_RADIUS/1000}km`, label: 'Radius',    icon: 'radio-button-on',  color: '#2980b9' },
+          { num: 'Free',                     label: 'No Key',    icon: 'shield-checkmark', color: '#8e44ad' },
+          { num: 'Live',                     label: 'Real Data', icon: 'checkmark-done',   color: '#e74c3c' },
         ].map((s, i, arr) => (
           <React.Fragment key={s.label}>
             <View style={styles.statItem}>
@@ -253,7 +204,6 @@ export default function HospitalLocatorScreen() {
         ))}
       </View>
 
-      {/* ── View on Google Maps CTA ── */}
       <TouchableOpacity style={styles.mapCta} onPress={openAllOnMap} activeOpacity={0.85}>
         <View style={styles.mapCtaIcon}><Ionicons name="map" size={22} color="#fff" /></View>
         <View style={styles.mapCtaBody}>
@@ -263,7 +213,6 @@ export default function HospitalLocatorScreen() {
         <Ionicons name="open-outline" size={18} color="rgba(255,255,255,0.8)" style={{ marginRight: 14 }} />
       </TouchableOpacity>
 
-      {/* ── Section Title + Refresh ── */}
       <View style={styles.sectionRow}>
         <View>
           <Text style={styles.sectionLabel}>NEARBY FACILITIES</Text>
@@ -279,7 +228,6 @@ export default function HospitalLocatorScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* ── Error State ── */}
       {error && (
         <View style={styles.errorCard}>
           <Ionicons name="wifi-outline" size={32} color="#e74c3c" />
@@ -291,7 +239,6 @@ export default function HospitalLocatorScreen() {
         </View>
       )}
 
-      {/* ── Empty State ── */}
       {!error && hospitals.length === 0 && (
         <View style={styles.errorCard}>
           <Ionicons name="business-outline" size={32} color="#ccc" />
@@ -303,7 +250,6 @@ export default function HospitalLocatorScreen() {
         </View>
       )}
 
-      {/* ── Hospital Cards ── */}
       {hospitals.map((item, index) => (
         <View key={item.id} style={styles.card}>
           <View style={styles.cardHeader}>
@@ -369,7 +315,7 @@ export default function HospitalLocatorScreen() {
         <View style={styles.disclaimer}>
           <Ionicons name="shield-checkmark" size={14} color="#aaa" />
           <Text style={styles.disclaimerText}>
-            Data from OpenStreetMap. Known Cebu hospital numbers are hardcoded as fallback. In a life-threatening emergency, always call 911 immediately.
+            Data from OpenStreetMap. Phone numbers shown are from OSM data only. In a life-threatening emergency, always call 911 immediately.
           </Text>
         </View>
       )}
@@ -380,12 +326,10 @@ export default function HospitalLocatorScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#f5f6f8' },
 
-  // Loading state — full screen with header
   center:          { flex: 1, backgroundColor: '#f5f6f8' },
   headerLoading:   { backgroundColor: '#27ae60', elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.2, shadowRadius: 6 },
   loadingBody:     { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 40 },
-  loadingIconWrap: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#fdecea', justifyContent: 'center', alignItems: 'center' },
-  loadingTitle:    { fontSize: 18, fontWeight: '800', color: '#1a1a2e', marginTop: 14 },
+  loadingTitle:    { fontSize: 18, fontWeight: '800', color: '#1a1a2e', marginTop: 16 },
   loadingSubtitle: { fontSize: 13, color: '#888', marginTop: 6 },
 
   header:      { backgroundColor: '#27ae60', elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.2, shadowRadius: 6 },

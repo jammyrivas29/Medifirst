@@ -20,7 +20,6 @@ const CATEGORIES = [
   { id: 'heat_stroke',title: 'Heat Stroke',icon: 'thermometer', color: '#f39c12', description: 'Heat-Related Emergency' },
 ];
 
-// ── MediFirst Assistant removed from here ──
 const QUICK_TOOLS = [
   { title: 'Nearby Hospitals',   sub: 'Find emergency care near you', icon: 'location', color: '#27ae60', bg: '#e9f7ef', action: 'hospital' },
   { title: 'Emergency Contacts', sub: 'Your saved emergency contacts', icon: 'people',   color: '#2980b9', bg: '#e8f4fb', action: 'emergency' },
@@ -33,115 +32,35 @@ const FIRST_AID_FACTS = [
   { fact: 'The Heimlich maneuver removes blockages in over 80% of choking cases.',       icon: 'warning',     color: '#e67e22' },
   { fact: 'Running cool water on a burn for 20 minutes significantly reduces damage.',   icon: 'flame',       color: '#f39c12' },
   { fact: 'Applying firm pressure for 10 minutes stops most external bleeding.',         icon: 'bandage',     color: '#c0392b' },
-  { fact: 'Most seizures stop on their own within 1–3 minutes without intervention.',    icon: 'pulse',       color: '#2980b9' },
+  { fact: 'Most seizures stop on their own within 1-3 minutes without intervention.',    icon: 'pulse',       color: '#2980b9' },
   { fact: 'Heat stroke is a medical emergency that requires immediate treatment.',        icon: 'thermometer', color: '#f39c12' },
   { fact: 'Stroke is the 5th leading cause of death and a major cause of disability.',   icon: 'medkit',      color: '#d35400' },
   { fact: 'Fractures can be open (bone protrudes) or closed (bone stays under skin).',   icon: 'body',        color: '#8e44ad' },
   { fact: 'Only 46% of cardiac arrest victims outside hospitals receive bystander CPR.', icon: 'people',      color: '#16a085' },
 ];
 
-// ── Sources & Citations for Info Modal ──
 const SOURCES = [
-  {
-    category: '🫀 CPR & Cardiac Arrest',
-    color: '#e74c3c',
-    items: [
-      { title: 'WikiHow — How to Perform CPR on an Adult, Child, Baby', url: 'https://www.wikihow.com/Perform-CPR' },
-    ],
-  },
-  {
-    category: '😮‍💨 Choking',
-    color: '#e67e22',
-    items: [
-      { title: 'WikiHow — How to Help a Choking Victim', url: 'https://www.wikihow.com/Help-a-Choking-Victim' },
-    ],
-  },
-  {
-    category: '🔥 Burns & Wounds',
-    color: '#f39c12',
-    items: [
-      { title: 'WikiHow — How to Treat a Burn', url: 'https://www.wikihow.com/Treat-a-Burn' },
-    ],
-  },
-  {
-    category: '🩹 Bleeding & Wounds',
-    color: '#c0392b',
-    items: [
-      { title: 'WikiHow — How to Stop a Cut from Bleeding', url: 'https://www.wikihow.com/Stop-Bleeding' },
-    ],
-  },
-  {
-    category: '🦴 Fractures & Broken Bones',
-    color: '#8e44ad',
-    items: [
-      { title: 'WikiHow — How to Treat a Broken Foot', url: 'https://www.wikihow.com/Treat-a-Foot-Fracture' },
-    ],
-  },
-  {
-    category: '⚡ Seizures',
-    color: '#2980b9',
-    items: [
-      { title: 'WikiHow — How to Help Someone Having a Seizure', url: 'https://www.wikihow.com/Stop-a-Seizure' },
-    ],
-  },
-  {
-    category: '🧠 Stroke',
-    color: '#d35400',
-    items: [
-      { title: 'WikiHow — How to Recognize a Stroke', url: 'https://www.wikihow.com/Identify-if-Someone-Had-a-Stroke' },
-    ],
-  },
-  {
-    category: '🌡️ Heat Stroke',
-    color: '#f39c12',
-    items: [
-      { title: 'WikiHow — How to Treat Heat Stroke', url: 'https://www.redcross.org/get-help/how-to-prepare-for-emergencies/types-of-emergencies/extreme-heat-safety/heat-check.html' },
-    ],
-  },
-  {
-    category: '☠️ Poisoning',
-    color: '#27ae60',
-    items: [
-      { title: 'WikiHow — How to Treat Poisoning', url: 'https://www.wikihow.com/Treat-Poisoning' },
-    ],
-  },
-  {
-    category: '🏥 Hospital & Emergency Locator',
-    color: '#27ae60',
-    items: [
-      { title: 'OpenStreetMap — Overpass API', url: 'https://overpass-api.de' },
-      { title: 'OpenStreetMap Foundation', url: 'https://www.openstreetmap.org' },
-    ],
-  },
-  {
-    category: '🤖 AI Assistant',
-    color: '#16a085',
-    items: [
-      { title: 'Groq AI — LLaMA 3.3 Model', url: 'https://console.groq.com' },
-      { title: 'Meta LLaMA 3 — Open Source LLM', url: 'https://ai.meta.com/llama/' },
-    ],
-  },
-  {
-    category: '📱 App Technology',
-    color: '#34495e',
-    items: [
-      { title: 'React Native — Mobile Framework', url: 'https://reactnative.dev' },
-      { title: 'Expo — Development Platform', url: 'https://expo.dev' },
-      { title: 'Node.js + MongoDB — Backend', url: 'https://nodejs.org' },
-    ],
-  },
+  { category: '🫀 CPR & Cardiac Arrest', color: '#e74c3c', items: [{ title: 'WikiHow — How to Perform CPR on an Adult, Child, Baby', url: 'https://www.wikihow.com/Perform-CPR' }] },
+  { category: '😮‍💨 Choking', color: '#e67e22', items: [{ title: 'WikiHow — How to Help a Choking Victim', url: 'https://www.wikihow.com/Help-a-Choking-Victim' }] },
+  { category: '🔥 Burns & Wounds', color: '#f39c12', items: [{ title: 'WikiHow — How to Treat a Burn', url: 'https://www.wikihow.com/Treat-a-Burn' }] },
+  { category: '🩹 Bleeding & Wounds', color: '#c0392b', items: [{ title: 'WikiHow — How to Stop a Cut from Bleeding', url: 'https://www.wikihow.com/Stop-Bleeding' }] },
+  { category: '🦴 Fractures & Broken Bones', color: '#8e44ad', items: [{ title: 'WikiHow — How to Treat a Broken Foot', url: 'https://www.wikihow.com/Treat-a-Foot-Fracture' }] },
+  { category: '⚡ Seizures', color: '#2980b9', items: [{ title: 'WikiHow — How to Help Someone Having a Seizure', url: 'https://www.wikihow.com/Stop-a-Seizure' }] },
+  { category: '🧠 Stroke', color: '#d35400', items: [{ title: 'WikiHow — How to Recognize a Stroke', url: 'https://www.wikihow.com/Identify-if-Someone-Had-a-Stroke' }] },
+  { category: '🌡️ Heat Stroke', color: '#f39c12', items: [{ title: 'WikiHow — How to Treat Heat Stroke', url: 'https://www.redcross.org/get-help/how-to-prepare-for-emergencies/types-of-emergencies/extreme-heat-safety/heat-check.html' }] },
+  { category: '☠️ Poisoning', color: '#27ae60', items: [{ title: 'WikiHow — How to Treat Poisoning', url: 'https://www.wikihow.com/Treat-Poisoning' }] },
+  { category: '🏥 Hospital & Emergency Locator', color: '#27ae60', items: [{ title: 'OpenStreetMap — Overpass API', url: 'https://overpass-api.de' }, { title: 'OpenStreetMap Foundation', url: 'https://www.openstreetmap.org' }] },
+  { category: '🤖 AI Assistant', color: '#16a085', items: [{ title: 'Groq AI — LLaMA 3.3 Model', url: 'https://console.groq.com' }, { title: 'Meta LLaMA 3 — Open Source LLM', url: 'https://ai.meta.com/llama/' }] },
+  { category: '📱 App Technology', color: '#34495e', items: [{ title: 'React Native — Mobile Framework', url: 'https://reactnative.dev' }, { title: 'Expo — Development Platform', url: 'https://expo.dev' }, { title: 'Node.js + MongoDB — Backend', url: 'https://nodejs.org' }] },
 ];
 
 function InfoModal({ visible, onClose }) {
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="pageSheet" onRequestClose={onClose}>
       <SafeAreaView style={infoStyles.container}>
-        {/* Header */}
         <View style={infoStyles.header}>
           <View style={infoStyles.headerLeft}>
-            <View style={infoStyles.headerIcon}>
-              <Ionicons name="information-circle" size={22} color="#fff" />
-            </View>
+            <View style={infoStyles.headerIcon}><Ionicons name="information-circle" size={22} color="#fff" /></View>
             <View>
               <Text style={infoStyles.headerTitle}>Sources & References</Text>
               <Text style={infoStyles.headerSub}>MediFirst App v1.0.0</Text>
@@ -151,15 +70,10 @@ function InfoModal({ visible, onClose }) {
             <Ionicons name="close" size={20} color="#555" />
           </TouchableOpacity>
         </View>
-
-        {/* Disclaimer */}
         <View style={infoStyles.disclaimer}>
           <Ionicons name="warning" size={14} color="#856404" />
-          <Text style={infoStyles.disclaimerText}>
-            MediFirst provides general first aid guidance only. Always consult a medical professional for emergencies.
-          </Text>
+          <Text style={infoStyles.disclaimerText}>MediFirst provides general first aid guidance only. Always consult a medical professional for emergencies.</Text>
         </View>
-
         <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ padding: 16, paddingBottom: 40 }}>
           {SOURCES.map((section) => (
             <View key={section.category} style={infoStyles.section}>
@@ -168,12 +82,7 @@ function InfoModal({ visible, onClose }) {
                 <Text style={infoStyles.sectionTitle}>{section.category}</Text>
               </View>
               {section.items.map((item, idx) => (
-                <TouchableOpacity
-                  key={idx}
-                  style={infoStyles.sourceRow}
-                  onPress={() => Linking.openURL(item.url)}
-                  activeOpacity={0.75}
-                >
+                <TouchableOpacity key={idx} style={infoStyles.sourceRow} onPress={() => Linking.openURL(item.url)} activeOpacity={0.75}>
                   <View style={infoStyles.sourceRowLeft}>
                     <Ionicons name="link" size={13} color={section.color} />
                     <Text style={infoStyles.sourceTitle}>{item.title}</Text>
@@ -183,13 +92,10 @@ function InfoModal({ visible, onClose }) {
               ))}
             </View>
           ))}
-
-          {/* App info */}
           <View style={infoStyles.appInfo}>
             <Text style={infoStyles.appInfoTitle}>MediFirst — First Aid Assistant</Text>
             <Text style={infoStyles.appInfoText}>Version 1.0.0 · Built for emergency preparedness</Text>
-            <Text style={infoStyles.appInfoText}>Developed as a capstone project</Text>
-            <Text style={infoStyles.appInfoText}>© 2025 MediFirst Team. All rights reserved.</Text>
+            <Text style={infoStyles.appInfoText}>© 2026 MediFirst Team. All rights reserved.</Text>
           </View>
         </ScrollView>
       </SafeAreaView>
@@ -201,8 +107,8 @@ export default function UserHomeScreen({ navigation }) {
   const dispatch  = useDispatch();
   const { user }  = useSelector((state) => state.auth);
   const firstName = user?.firstName || null;
-  const [locating,     setLocating]     = useState(false);
-  const [infoVisible,  setInfoVisible]  = useState(false);
+  const [locating,    setLocating]    = useState(false);
+  const [infoVisible, setInfoVisible] = useState(false);
 
   const handleToolPress = (action) => {
     switch (action) {
@@ -263,15 +169,12 @@ export default function UserHomeScreen({ navigation }) {
               </View>
             </View>
             <View style={styles.hdrActions}>
-              {/* ℹ️ Info button */}
               <TouchableOpacity style={styles.hdrIconBtn} onPress={() => setInfoVisible(true)} activeOpacity={0.85}>
                 <Ionicons name="information-circle-outline" size={22} color="#fff" />
               </TouchableOpacity>
-              {/* 👤 Profile button */}
               <TouchableOpacity style={styles.hdrIconBtn} onPress={() => navigation.navigate('Profile')} activeOpacity={0.85}>
                 <Ionicons name="person-circle" size={22} color="#fff" />
               </TouchableOpacity>
-              {/* 🚪 Sign out button */}
               <TouchableOpacity style={[styles.hdrIconBtn, styles.hdrSignOutBtn]} onPress={handleLogout} activeOpacity={0.85}>
                 <Ionicons name="log-out-outline" size={22} color="#fff" />
               </TouchableOpacity>
@@ -332,11 +235,12 @@ export default function UserHomeScreen({ navigation }) {
           ))}
         </ScrollView>
 
+        {/* Quick Tip — last item, no spacer below */}
         <View style={styles.tipCard}>
           <View style={styles.tipHeader}><Ionicons name="bulb" size={16} color="#f39c12" /><Text style={styles.tipTitle}>Quick Tip</Text></View>
           <Text style={styles.tipText}>In any emergency, always <Text style={{ fontWeight: '700', color: '#c0392b' }}>call 911 first</Text> before attempting first aid.</Text>
         </View>
-        <View style={{ height: 100 }} />
+
       </ScrollView>
 
       {/* ══ FLOATING CHAT BUBBLE ══ */}
@@ -352,7 +256,7 @@ export default function UserHomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container:        { flex: 1, backgroundColor: '#f5f6f8' },
-  contentContainer: { paddingBottom: 20 },
+  contentContainer: { paddingBottom: 16 },
 
   appHeader:     { backgroundColor: '#e74c3c', elevation: 6, shadowColor: '#c0392b', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.35, shadowRadius: 8 },
   hdrInner:      { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8 },
@@ -409,24 +313,15 @@ const styles = StyleSheet.create({
   tipText:   { fontSize: 13, color: '#856404', lineHeight: 19 },
 
   floatingBtn: {
-    position:        'absolute',
-    bottom:          30,
-    right:           20,
-    width:           58,
-    height:          58,
-    borderRadius:    29,
+    position: 'absolute', bottom: 30, right: 20,
+    width: 58, height: 58, borderRadius: 29,
     backgroundColor: '#e74c3c',
-    justifyContent:  'center',
-    alignItems:      'center',
-    elevation:       8,
-    shadowColor:     '#c0392b',
-    shadowOffset:    { width: 0, height: 4 },
-    shadowOpacity:   0.5,
-    shadowRadius:    8,
+    justifyContent: 'center', alignItems: 'center',
+    elevation: 8, shadowColor: '#c0392b',
+    shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8,
   },
 });
 
-// ── Info Modal Styles ──
 const infoStyles = StyleSheet.create({
   container:     { flex: 1, backgroundColor: '#f5f6f8' },
   header:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#e74c3c', paddingHorizontal: 16, paddingVertical: 14 },
@@ -435,19 +330,15 @@ const infoStyles = StyleSheet.create({
   headerTitle:   { fontSize: 17, fontWeight: '800', color: '#fff' },
   headerSub:     { fontSize: 11, color: 'rgba(255,255,255,0.75)', marginTop: 1 },
   closeBtn:      { width: 34, height: 34, borderRadius: 17, backgroundColor: 'rgba(255,255,255,0.9)', justifyContent: 'center', alignItems: 'center' },
-
   disclaimer:     { flexDirection: 'row', alignItems: 'flex-start', gap: 8, backgroundColor: '#fef9e7', paddingHorizontal: 16, paddingVertical: 10, borderBottomWidth: 1, borderBottomColor: '#fef0c0' },
   disclaimerText: { flex: 1, fontSize: 11, color: '#856404', lineHeight: 16 },
-
   section:       { marginBottom: 18 },
   sectionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
   sectionDot:    { width: 10, height: 10, borderRadius: 5 },
   sectionTitle:  { fontSize: 14, fontWeight: '800', color: '#1a1a2e' },
-
   sourceRow:     { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#fff', borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, marginBottom: 6, elevation: 1, shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.05, shadowRadius: 3 },
   sourceRowLeft: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
   sourceTitle:   { fontSize: 13, color: '#333', fontWeight: '500', flex: 1 },
-
   appInfo:      { backgroundColor: '#fff', borderRadius: 13, padding: 16, marginTop: 8, alignItems: 'center', borderWidth: 1, borderColor: '#f0f0f0' },
   appInfoTitle: { fontSize: 15, fontWeight: '800', color: '#1a1a2e', marginBottom: 6 },
   appInfoText:  { fontSize: 12, color: '#888', marginBottom: 3, textAlign: 'center' },

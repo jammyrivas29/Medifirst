@@ -28,7 +28,6 @@ const MEMBER_PERKS = [
   { icon: 'notifications', color: '#16a085', bg: '#e8f8f5', label: 'Emergency\nAlerts' },
 ];
 
-// What gets "downloaded" — metadata only, images are already bundled in the app
 const GUIDE_PREVIEWS = [
   { id: 'local_cpr',        icon: 'heart',       color: '#e74c3c', label: 'CPR'          },
   { id: 'local_choking',    icon: 'warning',     color: '#e67e22', label: 'Choking'      },
@@ -46,10 +45,10 @@ export default function GuestHomeScreen({ navigation }) {
   const fadeAnim  = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
 
-  const [isDownloaded,    setIsDownloaded]    = useState(false);
-  const [downloading,     setDownloading]     = useState(false);
-  const [downloadProgress, setDownloadProgress] = useState(0); // 0–9
-  const [promptVisible,   setPromptVisible]   = useState(false);
+  const [isDownloaded,      setIsDownloaded]      = useState(false);
+  const [downloading,       setDownloading]       = useState(false);
+  const [downloadProgress,  setDownloadProgress]  = useState(0);
+  const [promptVisible,     setPromptVisible]     = useState(false);
 
   useEffect(() => {
     Animated.parallel([
@@ -59,7 +58,6 @@ export default function GuestHomeScreen({ navigation }) {
     initApp();
   }, []);
 
-  // ── On first launch: check download status, show prompt if not yet downloaded ──
   const initApp = async () => {
     try {
       const [downloaded, launched] = await Promise.all([
@@ -68,22 +66,17 @@ export default function GuestHomeScreen({ navigation }) {
       ]);
       const alreadyDownloaded = downloaded === 'true';
       setIsDownloaded(alreadyDownloaded);
-
-      // Show prompt only on first launch and only if not yet downloaded
       if (!alreadyDownloaded && launched !== 'true') {
-        // Small delay so the screen renders first
         setTimeout(() => setPromptVisible(true), 600);
       }
     } catch (_) {}
   };
 
-  // ── Dismiss prompt and mark first launch done (without downloading) ──
   const dismissPrompt = async () => {
     setPromptVisible(false);
     try { await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true'); } catch (_) {}
   };
 
-  // ── Animated download: step through each guide with a small delay ──────────
   const handleDownload = async (fromPrompt = false) => {
     if (isDownloaded) {
       Alert.alert(
@@ -96,14 +89,10 @@ export default function GuestHomeScreen({ navigation }) {
       );
       return;
     }
-
     if (fromPrompt) setPromptVisible(false);
-
     setDownloading(true);
     setDownloadProgress(0);
-
     try {
-      // Simulate saving each guide one-by-one (assets are already bundled)
       for (let i = 1; i <= TOTAL_GUIDES; i++) {
         await new Promise(r => setTimeout(r, 200));
         setDownloadProgress(i);
@@ -111,10 +100,7 @@ export default function GuestHomeScreen({ navigation }) {
       await AsyncStorage.setItem(GUIDES_DOWNLOAD_KEY, 'true');
       await AsyncStorage.setItem(FIRST_LAUNCH_KEY, 'true');
       setIsDownloaded(true);
-      Alert.alert(
-        '✅ All Guides Saved!',
-        `${TOTAL_GUIDES} first-aid guides are now on your device.\nThey will load instantly — even without internet or an account.`
-      );
+      Alert.alert('✅ All Guides Saved!', `${TOTAL_GUIDES} first-aid guides are now on your device.\nThey will load instantly — even without internet or an account.`);
     } catch (_) {
       Alert.alert('Error', 'Could not save guides. Please try again.');
     } finally {
@@ -149,26 +135,16 @@ export default function GuestHomeScreen({ navigation }) {
 
   return (
     <>
-      {/* ══ FIRST-LAUNCH DOWNLOAD PROMPT MODAL ══ */}
-      <Modal
-        visible={promptVisible}
-        transparent
-        animationType="fade"
-        onRequestClose={dismissPrompt}
-      >
+      <Modal visible={promptVisible} transparent animationType="fade" onRequestClose={dismissPrompt}>
         <View style={styles.promptOverlay}>
           <View style={styles.promptCard}>
-            {/* Icon */}
             <View style={styles.promptIconWrap}>
               <Ionicons name="download" size={32} color="#fff" />
             </View>
-
             <Text style={styles.promptTitle}>Save Guides for Offline Use</Text>
             <Text style={styles.promptDesc}>
               Download all {TOTAL_GUIDES} first-aid guides to your device so they're available anytime — even without internet or an account.
             </Text>
-
-            {/* Guide preview chips */}
             <View style={styles.promptChips}>
               {GUIDE_PREVIEWS.map(g => (
                 <View key={g.id} style={[styles.promptChip, { backgroundColor: g.color + '15', borderColor: g.color + '40' }]}>
@@ -177,22 +153,14 @@ export default function GuestHomeScreen({ navigation }) {
                 </View>
               ))}
             </View>
-
             <View style={styles.promptInfoRow}>
               <Ionicons name="checkmark-circle" size={14} color="#27ae60" />
               <Text style={styles.promptInfoText}>Free · No account needed · Works offline</Text>
             </View>
-
-            {/* Buttons */}
-            <TouchableOpacity
-              style={styles.promptDownloadBtn}
-              onPress={() => handleDownload(true)}
-              activeOpacity={0.85}
-            >
+            <TouchableOpacity style={styles.promptDownloadBtn} onPress={() => handleDownload(true)} activeOpacity={0.85}>
               <Ionicons name="download" size={18} color="#fff" />
               <Text style={styles.promptDownloadBtnText}>Download Now</Text>
             </TouchableOpacity>
-
             <TouchableOpacity style={styles.promptSkipBtn} onPress={dismissPrompt} activeOpacity={0.7}>
               <Text style={styles.promptSkipText}>Maybe later</Text>
             </TouchableOpacity>
@@ -253,30 +221,19 @@ export default function GuestHomeScreen({ navigation }) {
             <Ionicons name="warning" size={14} color="#e74c3c" />
             <Text style={styles.cardHeaderText}>Always available — no sign-in needed</Text>
           </View>
-
-          {/* Call 911 */}
           <TouchableOpacity style={styles.cardRow} onPress={handleCall911} activeOpacity={0.82}>
             <View style={[styles.rowIcon, { backgroundColor: '#e74c3c' }]}><Ionicons name="call" size={20} color="#fff" /></View>
             <View style={styles.rowText}><Text style={styles.rowTitle}>Call 911</Text><Text style={styles.rowSub}>Ambulance · Fire · Police</Text></View>
             <View style={[styles.rowBadge, { backgroundColor: '#fdecea' }]}><Text style={styles.rowBadgeText}>CALL</Text></View>
           </TouchableOpacity>
           <View style={styles.cardDivider} />
-
-          {/* First Aid Guides */}
           <TouchableOpacity style={styles.cardRow} onPress={() => navigation.navigate('Guides')} activeOpacity={0.82}>
             <View style={[styles.rowIcon, { backgroundColor: '#2980b9' }]}><Ionicons name="medical" size={20} color="#fff" /></View>
             <View style={styles.rowText}><Text style={styles.rowTitle}>First Aid Guides</Text><Text style={styles.rowSub}>CPR, burns, choking & more — offline</Text></View>
             <View style={[styles.rowBadge, { backgroundColor: '#e8f4fb' }]}><Text style={styles.rowBadgeText}>FREE</Text></View>
           </TouchableOpacity>
           <View style={styles.cardDivider} />
-
-          {/* Download Guides */}
-          <TouchableOpacity
-            style={styles.cardRow}
-            onPress={() => handleDownload(false)}
-            activeOpacity={0.82}
-            disabled={downloading}
-          >
+          <TouchableOpacity style={styles.cardRow} onPress={() => handleDownload(false)} activeOpacity={0.82} disabled={downloading}>
             <View style={[styles.rowIcon, { backgroundColor: isDownloaded ? '#27ae60' : '#8e44ad' }]}>
               {downloading
                 ? <ActivityIndicator size="small" color="#fff" />
@@ -285,22 +242,15 @@ export default function GuestHomeScreen({ navigation }) {
             </View>
             <View style={styles.rowText}>
               <Text style={styles.rowTitle}>
-                {downloading
-                  ? `Saving guides… ${downloadProgress}/${TOTAL_GUIDES}`
-                  : isDownloaded ? 'Guides Downloaded' : 'Download Guides'
-                }
+                {downloading ? `Saving guides… ${downloadProgress}/${TOTAL_GUIDES}` : isDownloaded ? 'Guides Downloaded' : 'Download Guides'}
               </Text>
-              {/* Progress bar while downloading */}
               {downloading ? (
                 <View style={styles.progressBarWrap}>
                   <View style={[styles.progressBarFill, { width: `${(downloadProgress / TOTAL_GUIDES) * 100}%` }]} />
                 </View>
               ) : (
                 <Text style={styles.rowSub}>
-                  {isDownloaded
-                    ? `${TOTAL_GUIDES} guides saved — works without internet`
-                    : `Save all ${TOTAL_GUIDES} guides for offline use — no account needed`
-                  }
+                  {isDownloaded ? `${TOTAL_GUIDES} guides saved — works without internet` : `Save all ${TOTAL_GUIDES} guides for offline use — no account needed`}
                 </Text>
               )}
             </View>
@@ -381,7 +331,6 @@ export default function GuestHomeScreen({ navigation }) {
           <Ionicons name="information-circle" size={17} color="#f39c12" />
           <Text style={styles.tipText}>In any emergency, <Text style={{ fontWeight: '700' }}>call 911 first</Text> before attempting first aid.</Text>
         </View>
-        <View style={{ height: 100 }} />
       </ScrollView>
 
       {/* Floating chat button */}
@@ -393,10 +342,9 @@ export default function GuestHomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container:        { flex: 1, backgroundColor: '#f7f8fa' },
-  contentContainer: { paddingBottom: 20 },
+  container:        { flex: 1, backgroundColor: '#f5f6f8' },
+  contentContainer: { paddingBottom: 0 },
 
-  // ── Header ──
   appHeader:       { backgroundColor: '#e74c3c', elevation: 6, shadowColor: '#c0392b', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.35, shadowRadius: 8 },
   hdrInner:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8 },
   hdrBrand:        { flexDirection: 'row', alignItems: 'center', gap: 10 },
@@ -431,7 +379,6 @@ const styles = StyleSheet.create({
   rowBadge:        { borderRadius: 8, paddingHorizontal: 9, paddingVertical: 4 },
   rowBadgeText:    { fontSize: 11, fontWeight: '800', color: '#555', letterSpacing: 0.4 },
 
-  // ── Progress bar ──
   progressBarWrap: { height: 4, backgroundColor: '#f0e6fc', borderRadius: 4, marginTop: 6, overflow: 'hidden' },
   progressBarFill: { height: 4, backgroundColor: '#8e44ad', borderRadius: 4 },
 
@@ -449,26 +396,21 @@ const styles = StyleSheet.create({
   loginBtnText:      { fontSize: 14, color: '#888' },
   loginBtnHighlight: { fontSize: 14, fontWeight: '700', color: '#3498db' },
 
-  tip:     { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#fffbf0', marginHorizontal: 16, marginTop: 22, borderRadius: 12, padding: 14, gap: 10, borderLeftWidth: 4, borderLeftColor: '#f39c12' },
+  tip:     { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#fffbf0', marginHorizontal: 16, marginTop: 16, marginBottom: 0, borderRadius: 12, padding: 14, gap: 10, borderLeftWidth: 4, borderLeftColor: '#f39c12' },
   tipText: { flex: 1, fontSize: 12, color: '#7d6608', lineHeight: 18 },
 
-  floatingBtn: { position: 'absolute', bottom: 50, right: 20, width: 58, height: 58, borderRadius: 29, backgroundColor: '#e74c3c', justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#c0392b', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8 },
+  floatingBtn: { position: 'absolute', bottom: 20, right: 20, width: 58, height: 58, borderRadius: 29, backgroundColor: '#e74c3c', justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#c0392b', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8 },
 
-  // ── First-launch download prompt ──
   promptOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: 24 },
   promptCard:    { backgroundColor: '#fff', borderRadius: 24, padding: 24, width: '100%', alignItems: 'center', elevation: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.18, shadowRadius: 16 },
-
   promptIconWrap:  { width: 68, height: 68, borderRadius: 20, backgroundColor: '#8e44ad', justifyContent: 'center', alignItems: 'center', marginBottom: 16 },
   promptTitle:     { fontSize: 20, fontWeight: '900', color: '#1a1a2e', textAlign: 'center', marginBottom: 10 },
   promptDesc:      { fontSize: 13, color: '#666', textAlign: 'center', lineHeight: 20, marginBottom: 16 },
-
   promptChips:     { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 7, marginBottom: 14 },
   promptChip:      { flexDirection: 'row', alignItems: 'center', gap: 4, paddingHorizontal: 9, paddingVertical: 4, borderRadius: 20, borderWidth: 1 },
   promptChipText:  { fontSize: 11, fontWeight: '700' },
-
   promptInfoRow:   { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 20 },
   promptInfoText:  { fontSize: 12, color: '#27ae60', fontWeight: '600' },
-
   promptDownloadBtn:     { flexDirection: 'row', alignItems: 'center', gap: 9, backgroundColor: '#8e44ad', borderRadius: 14, paddingVertical: 14, paddingHorizontal: 28, marginBottom: 10, width: '100%', justifyContent: 'center', elevation: 4 },
   promptDownloadBtnText: { fontSize: 15, fontWeight: '800', color: '#fff' },
   promptSkipBtn:         { paddingVertical: 10 },
