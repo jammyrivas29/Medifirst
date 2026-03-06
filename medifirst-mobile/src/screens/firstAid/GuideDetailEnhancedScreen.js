@@ -9,6 +9,12 @@ import { getGuideById } from '../../api/firstAidApi';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
 
+const CPR_VIDEO_MAP = {
+  adult: { videoUrl: require('../../../assets/videos/Adult.mp4'), title: 'CPR for Adults',   duration: '3:45', category: 'cpr' },
+  child: { videoUrl: require('../../../assets/videos/chil.mp4'),  title: 'CPR for Children', duration: '4:10', category: 'cpr' },
+  baby:  { videoUrl: require('../../../assets/videos/baby.mp4'),  title: 'CPR for Baby',     duration: '2:41', category: 'cpr' },
+};
+
 const GUIDE_VIDEO_MAP = {
   local_cpr:        { videoUrl: require('../../../assets/videos/cpr.mp4'),        title: 'How to Perform CPR',            duration: '3:50', category: 'cpr'        },
   local_choking:    { videoUrl: require('../../../assets/videos/choking.mp4'),    title: 'Heimlich Maneuver for Choking', duration: '2:41', category: 'choking'    },
@@ -243,8 +249,8 @@ export default function GuideDetailScreen({ navigation, route }) {
   const scrollRef = useRef(null);
 
   const guideKey    = guideId || localGuide?._id;
-  const linkedVideo = GUIDE_VIDEO_MAP[guideKey] || null;
   const isCpr       = guide?.hasCprModes === true;
+  const linkedVideo = (isCpr && cprMode) ? (CPR_VIDEO_MAP[cprMode] || null) : (GUIDE_VIDEO_MAP[guideKey] || null);
 
   useEffect(() => { if (!localGuide) fetchGuide(); }, [guideId]);
   // Reset CPR selection whenever guide changes

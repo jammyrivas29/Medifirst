@@ -399,7 +399,7 @@ const styles = StyleSheet.create({
   tip:     { flexDirection: 'row', alignItems: 'flex-start', backgroundColor: '#fffbf0', marginHorizontal: 16, marginTop: 16, marginBottom: 0, borderRadius: 12, padding: 14, gap: 10, borderLeftWidth: 4, borderLeftColor: '#f39c12' },
   tipText: { flex: 1, fontSize: 12, color: '#7d6608', lineHeight: 18 },
 
-  floatingBtn: { position: 'absolute', bottom: 20, right: 20, width: 58, height: 58, borderRadius: 29, backgroundColor: '#e74c3c', justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#c0392b', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8 },
+  floatingBtn: { position: 'absolute', bottom: 80, right: 20, width: 58, height: 58, borderRadius: 29, backgroundColor: '#e74c3c', justifyContent: 'center', alignItems: 'center', elevation: 8, shadowColor: '#c0392b', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.5, shadowRadius: 8 },
 
   promptOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'center', alignItems: 'center', padding: 24 },
   promptCard:    { backgroundColor: '#fff', borderRadius: 24, padding: 24, width: '100%', alignItems: 'center', elevation: 12, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.18, shadowRadius: 16 },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import {
   View, Text, StyleSheet, ScrollView,
-  TouchableOpacity, Dimensions, StatusBar,
+  TouchableOpacity, Dimensions, StatusBar, Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useVideoPlayer, VideoView } from 'expo-video';
@@ -11,20 +11,23 @@ import { useFocusEffect } from '@react-navigation/native';
 const { width } = Dimensions.get('window');
 
 const VIDEOS = [
-  { id: 1, title: 'How to Perform CPR', category: 'cpr', duration: '3:50', videoUrl: require('../../../assets/videos/cpr.mp4'), description: 'Learn the proper technique for performing CPR on adults, including chest compressions and rescue breaths.' },
-  { id: 2, title: 'Heimlich Maneuver for Choking', category: 'choking', duration: '2:41', videoUrl: require('../../../assets/videos/choking.mp4'), description: 'Step-by-step demonstration of the Heimlich maneuver to help someone who is choking.' },
-  { id: 3, title: 'Treating Burns Properly', category: 'burns', duration: '1:30', videoUrl: require('../../../assets/videos/burns.mp4'), description: 'Learn how to properly treat first, second, and third-degree burns.' },
-  { id: 4, title: 'Controlling Severe Bleeding', category: 'bleeding', duration: '4:27', videoUrl: require('../../../assets/videos/bleeding.mp4'), description: 'Techniques for applying pressure and controlling severe bleeding in emergency situations.' },
-  { id: 5, title: 'Fracture Immobilization', category: 'fractures', duration: '2:52', videoUrl: require('../../../assets/videos/fractures.mp4'), description: 'How to properly immobilize a fractured bone using splints and available materials.' },
-  { id: 6, title: 'Seizure Guidelines', category: 'seizures', duration: '2:35', videoUrl: require('../../../assets/videos/seizures.mp4'), description: 'Learn how to safely assist someone experiencing a seizure.' },
-  { id: 7, title: 'Stroke Recognition', category: 'stroke', duration: '3:15', videoUrl: require('../../../assets/videos/stroke.mp4'), description: 'Recognize the signs of a stroke and learn how to respond quickly.' },
-  { id: 8, title: 'Poisoning Response', category: 'poison', duration: '2:20', videoUrl: require('../../../assets/videos/poison.mp4'), description: 'Steps to take if you suspect someone has been poisoned.' },
-  { id: 9, title: 'Heat Stroke Response', category: 'heat_stroke', duration: '3:05', videoUrl: require('../../../assets/videos/heatstroke.mp4'), description: 'Learn how to respond to heat stroke and prevent it from worsening.' },
+  { id: 1,  title: 'CPR Basics for Adults',         category: 'cpr',        duration: '3:45', videoUrl: require('../../../assets/videos/Adult.mp4'),     description: 'Learn the essential steps of performing CPR on adults in emergency situations.' },
+  { id: 2,  title: 'CPR for Children',              category: 'cpr',        duration: '4:10', videoUrl: require('../../../assets/videos/chil.mp4'),      description: 'Step-by-step guide to performing CPR on children and infants safely and effectively.' },
+  { id: 3,  title: 'CPR for Baby',                  category: 'cpr',        duration: '2:41', videoUrl: require('../../../assets/videos/baby.mp4'),      description: 'Step-by-step demonstration of the Heimlich maneuver to help someone who is choking.' },
+  { id: 4,  title: 'Heimlich Maneuver for Choking', category: 'choking',    duration: '2:41', videoUrl: require('../../../assets/videos/choking.mp4'),   description: 'Step-by-step demonstration of the Heimlich maneuver to help someone who is choking.' },
+  { id: 5,  title: 'Treating Burns Properly',       category: 'burns',      duration: '1:30', videoUrl: require('../../../assets/videos/burns.mp4'),     description: 'Learn how to properly treat first, second, and third-degree burns.' },
+  { id: 6,  title: 'Controlling Severe Bleeding',   category: 'bleeding',   duration: '4:27', videoUrl: require('../../../assets/videos/bleeding.mp4'),  description: 'Techniques for applying pressure and controlling severe bleeding in emergency situations.' },
+  { id: 7,  title: 'Fracture Immobilization',       category: 'fractures',  duration: '2:52', videoUrl: require('../../../assets/videos/fractures.mp4'), description: 'How to properly immobilize a fractured bone using splints and available materials.' },
+  { id: 8,  title: 'Seizure Guidelines',            category: 'seizures',   duration: '2:35', videoUrl: require('../../../assets/videos/seizures.mp4'),  description: 'Learn how to safely assist someone experiencing a seizure.' },
+  { id: 9,  title: 'Stroke Recognition',            category: 'stroke',     duration: '3:15', videoUrl: require('../../../assets/videos/stroke.mp4'),    description: 'Recognize the signs of a stroke and learn how to respond quickly.' },
+  { id: 10, title: 'Poisoning Response',            category: 'poison',     duration: '2:20', videoUrl: require('../../../assets/videos/poison.mp4'),    description: 'Steps to take if you suspect someone has been poisoned.' },
+  { id: 11, title: 'Heat Stroke Response',          category: 'heat_stroke',duration: '3:05', videoUrl: require('../../../assets/videos/heatstroke.mp4'),description: 'Learn how to respond to heat stroke and prevent it from worsening.' },
 ];
 
 const CATEGORY_COLORS = {
   cpr: '#e74c3c', choking: '#e67e22', burns: '#f39c12',
-  bleeding: '#c0392b', fractures: '#0ed180', seizures: '#3498db', heatstroke: '#e74c3c', stroke: '#9b59b6', poison: '#27ae60',
+  bleeding: '#c0392b', fractures: '#0ed180', seizures: '#3498db',
+  heatstroke: '#e74c3c', stroke: '#9b59b6', poison: '#27ae60',
 };
 
 const formatTime = (sec) => {
@@ -47,22 +50,28 @@ function VideoPlayer({ selectedVideo, onClose }) {
     p.play();
   });
 
-  // Pause video when screen loses focus (tab change or navigation)
+  // ── KEY FIX: set StatusBar dark when player mounts, restore when it unmounts ──
+  useEffect(() => {
+    // Enter video mode: black status bar
+    StatusBar.setBarStyle('light-content');
+    if (Platform.OS === 'android') StatusBar.setBackgroundColor('#000');
+
+    return () => {
+      // EXIT video mode: restore to app default (red header style)
+      StatusBar.setBarStyle('light-content');
+      if (Platform.OS === 'android') StatusBar.setBackgroundColor('#e74c3c');
+    };
+  }, []);
+
+  // Pause when screen loses focus
   useFocusEffect(
     useCallback(() => {
-      // Optional: Resume when screen comes back into focus
-      // player?.play();
-
       return () => {
-        // Pause when screen loses focus
-        try {
-          player?.pause();
-        } catch (_) {}
+        try { player?.pause(); } catch (_) {}
       };
     }, [player])
   );
 
-  // Status change — know when ready + grab duration
   const { status } = useEvent(player, 'statusChange', { status: player.status });
   useEffect(() => {
     try {
@@ -71,13 +80,9 @@ function VideoPlayer({ selectedVideo, onClose }) {
     } catch (_) {}
   }, [status]);
 
-  // Play/pause state
   const { isPlaying: eventPlaying } = useEvent(player, 'playingChange', { isPlaying: true });
-  useEffect(() => {
-    setIsPlaying(eventPlaying);
-  }, [eventPlaying]);
+  useEffect(() => { setIsPlaying(eventPlaying); }, [eventPlaying]);
 
-  // Current time — updates every 500ms
   const { currentTime: eventTime } = useEvent(player, 'timeUpdate', { currentTime: 0, bufferedPosition: 0 });
   useEffect(() => {
     if (eventTime !== undefined && eventTime >= 0) setCurrentTime(eventTime);
@@ -88,9 +93,7 @@ function VideoPlayer({ selectedVideo, onClose }) {
 
   const togglePlayPause = useCallback(() => {
     if (!player) return;
-    try {
-      isPlaying ? player.pause() : player.play();
-    } catch (_) {}
+    try { isPlaying ? player.pause() : player.play(); } catch (_) {}
   }, [player, isPlaying]);
 
   const handleClose = useCallback(() => {
@@ -102,8 +105,6 @@ function VideoPlayer({ selectedVideo, onClose }) {
 
   return (
     <View style={styles.playerContainer}>
-      <StatusBar barStyle="light-content" backgroundColor="#000" />
-
       {/* Back button */}
       <TouchableOpacity onPress={handleClose} style={styles.closeBtn}>
         <Ionicons name="arrow-back" size={20} color="#fff" />
@@ -119,7 +120,7 @@ function VideoPlayer({ selectedVideo, onClose }) {
         nativeControls={false}
       />
 
-      {/* Play / Pause only */}
+      {/* Play / Pause */}
       <View style={styles.controlsRow}>
         <TouchableOpacity onPress={togglePlayPause} style={styles.playPauseBtn} activeOpacity={0.8}>
           <Ionicons name={isPlaying ? 'pause' : 'play'} size={34} color="#fff" />
@@ -167,6 +168,14 @@ function VideoPlayer({ selectedVideo, onClose }) {
 // ── Main Screen ───────────────────────────────────────────────────────────────
 export default function VideoInstructionsScreen({ route }) {
   const [selectedVideo, setSelectedVideo] = useState(null);
+
+  // ── KEY FIX: always restore StatusBar when showing the video list ──
+  useEffect(() => {
+    if (!selectedVideo) {
+      StatusBar.setBarStyle('light-content');
+      if (Platform.OS === 'android') StatusBar.setBackgroundColor('#e74c3c');
+    }
+  }, [selectedVideo]);
 
   useEffect(() => {
     if (route?.params?.autoPlay) {
@@ -256,7 +265,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center', alignItems: 'center',
   },
   headerTitle: { fontSize: 20, fontWeight: '800', color: '#fff' },
-  headerSub: { fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 2 },
+  headerSub:   { fontSize: 13, color: 'rgba(255,255,255,0.8)', marginTop: 2 },
   list: { paddingBottom: 20 },
   sectionTitle: { fontSize: 17, fontWeight: '700', color: '#333', margin: 16, marginBottom: 10 },
   videoCard: {
@@ -276,14 +285,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4,
   },
   durationText: { color: '#fff', fontSize: 11, fontWeight: '600' },
-  cardContent: { flex: 1, padding: 12 },
+  cardContent:  { flex: 1, padding: 12 },
   catTag: {
     alignSelf: 'flex-start', paddingHorizontal: 8,
     paddingVertical: 3, borderRadius: 6, marginBottom: 6,
   },
-  catTagText: { fontSize: 10, fontWeight: '700' },
-  cardTitle: { fontSize: 14, fontWeight: '700', color: '#1a1a2e', marginBottom: 4 },
-  cardDesc: { fontSize: 12, color: '#888', lineHeight: 17 },
+  catTagText:  { fontSize: 10, fontWeight: '700' },
+  cardTitle:   { fontSize: 14, fontWeight: '700', color: '#1a1a2e', marginBottom: 4 },
+  cardDesc:    { fontSize: 12, color: '#888', lineHeight: 17 },
   tipCard: {
     flexDirection: 'row', alignItems: 'flex-start',
     backgroundColor: '#fffbf0', margin: 16, borderRadius: 12,
@@ -299,8 +308,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14, paddingVertical: 10,
   },
   closeBtnText: { color: '#fff', fontSize: 14, fontWeight: '600' },
-  video: { width, height: width * 9 / 16 },
-
+  video:        { width, height: width * 9 / 16 },
   controlsRow: {
     alignItems: 'center', justifyContent: 'center',
     backgroundColor: '#000', paddingVertical: 14,
@@ -310,31 +318,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255,255,255,0.18)',
     justifyContent: 'center', alignItems: 'center',
   },
-
   timerBar: {
     flexDirection: 'row', alignItems: 'center',
     backgroundColor: '#111', paddingHorizontal: 14, paddingVertical: 8, gap: 10,
   },
-  timerText: { color: '#fff', fontSize: 12, fontWeight: '600', minWidth: 38 },
-  progressTrack: {
-    flex: 1, height: 4, backgroundColor: '#444', borderRadius: 2, overflow: 'hidden',
-  },
-  progressFill: { height: '100%', backgroundColor: '#e74c3c', borderRadius: 2 },
-
-  loadingBanner: {
-    backgroundColor: '#222', paddingVertical: 6, alignItems: 'center',
-  },
-  loadingText: { color: '#aaa', fontSize: 12 },
-
+  timerText:     { color: '#fff', fontSize: 12, fontWeight: '600', minWidth: 38 },
+  progressTrack: { flex: 1, height: 4, backgroundColor: '#444', borderRadius: 2, overflow: 'hidden' },
+  progressFill:  { height: '100%', backgroundColor: '#e74c3c', borderRadius: 2 },
+  loadingBanner: { backgroundColor: '#222', paddingVertical: 6, alignItems: 'center' },
+  loadingText:   { color: '#aaa', fontSize: 12 },
   videoInfoScroll: { flex: 1, backgroundColor: '#fff' },
-  videoInfo: { padding: 20 },
+  videoInfo:       { padding: 20 },
   categoryBadge: {
     alignSelf: 'flex-start', paddingHorizontal: 10,
     paddingVertical: 4, borderRadius: 8, marginBottom: 10,
   },
   categoryBadgeText: { color: '#fff', fontSize: 11, fontWeight: '700' },
-  videoTitle: { fontSize: 20, fontWeight: '800', color: '#1a1a2e', marginBottom: 8 },
-  videoDurationRow: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
-  videoDuration: { fontSize: 14, color: '#888' },
-  videoDesc: { fontSize: 14, color: '#555', lineHeight: 22 },
+  videoTitle:        { fontSize: 20, fontWeight: '800', color: '#1a1a2e', marginBottom: 8 },
+  videoDurationRow:  { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 12 },
+  videoDuration:     { fontSize: 14, color: '#888' },
+  videoDesc:         { fontSize: 14, color: '#555', lineHeight: 22 },
 });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View } from 'react-native';
+import { View, StatusBar, Platform } from 'react-native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createStackNavigator } from '@react-navigation/stack';
 import { Ionicons } from '@expo/vector-icons';
@@ -77,7 +77,6 @@ function GuestStack() {
           headerTintColor: '#fff',
         }}
       />
-      {/* headerShown: false → HospitalLocatorScreen's own green header shows, no duplicate bar */}
       <Stack.Screen
         name="Hospital"
         component={HospitalLocatorScreen}
@@ -97,6 +96,23 @@ export default function TabNavigator() {
 
   return (
     <Tab.Navigator
+      screenListeners={({ route }) => ({
+        focus: () => {
+          // Restore correct status bar color per tab when focused
+          StatusBar.setBarStyle('light-content');
+          if (Platform.OS === 'android') {
+            const colors = {
+              Hospital: '#27ae60',
+              Home:     '#e74c3c',
+              Guides:   '#e74c3c',
+              Emergency:'#e74c3c',
+              Profile:  '#e74c3c',
+              Chatbot:  '#e74c3c',
+            };
+            StatusBar.setBackgroundColor(colors[route.name] || '#e74c3c');
+          }
+        },
+      })}
       screenOptions={({ route }) => ({
         tabBarIcon: ({ focused, color, size }) => {
           const icons = {
@@ -119,7 +135,7 @@ export default function TabNavigator() {
       <Tab.Screen
         name="Home"
         component={UserHomeScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, sceneContainerStyle: { marginTop: 0, paddingTop: 0 } }}
       />
       <Tab.Screen
         name="Guides"
@@ -129,13 +145,14 @@ export default function TabNavigator() {
       <Tab.Screen
         name="Hospital"
         component={HospitalLocatorScreen}
-        options={{ headerShown: false }}
+        options={{ headerShown: false, sceneContainerStyle: { marginTop: 0, paddingTop: 0 } }}
       />
       <Tab.Screen
         name="Emergency"
         component={EmergencyScreen}
         options={{
           headerShown: false,
+          sceneContainerStyle: { marginTop: 0, paddingTop: 0 },
           tabBarLabel: 'Emergency',
           tabBarBadge: '!',
           tabBarBadgeStyle: { backgroundColor: '#e74c3c', color: '#fff' },
@@ -150,10 +167,14 @@ export default function TabNavigator() {
           title: 'AI Assistant',
         }}
       />
+      {/* Profile: headerShown false, no auto insets injected by navigator */}
       <Tab.Screen
         name="Profile"
         component={ProfileScreen}
-        options={{ headerShown: false }}
+        options={{
+          headerShown: false,
+          sceneContainerStyle: { marginTop: 0, paddingTop: 0 },
+        }}
       />
     </Tab.Navigator>
   );

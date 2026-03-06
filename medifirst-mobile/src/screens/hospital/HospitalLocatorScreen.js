@@ -165,7 +165,7 @@ export default function HospitalLocatorScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+    <ScrollView style={styles.container} contentContainerStyle={{ paddingBottom: 8 }} showsVerticalScrollIndicator={false}>
 
       <SafeAreaView style={styles.header}>
         {Platform.OS === 'android' && <View style={{ height: StatusBar.currentHeight || 0 }} />}
@@ -181,6 +181,10 @@ export default function HospitalLocatorScreen() {
             <View style={[styles.gpsDot, { backgroundColor: location ? '#2ecc71' : '#f39c12' }]} />
             <Text style={styles.gpsText}>{location ? 'GPS On' : 'No GPS'}</Text>
           </View>
+        </View>
+        <View style={styles.hdrStrip}>
+          <View style={styles.hdrLiveDot} />
+          <Text style={styles.hdrStripText}>Showing hospitals within {SEARCH_RADIUS / 1000}km of your location</Text>
         </View>
       </SafeAreaView>
 
@@ -333,9 +337,12 @@ const styles = StyleSheet.create({
   loadingSubtitle: { fontSize: 13, color: '#888', marginTop: 6 },
 
   header:      { backgroundColor: '#27ae60', elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 3 }, shadowOpacity: 0.2, shadowRadius: 6 },
-  headerInner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 14 },
+  headerInner: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingVertical: 8 },
   headerLeft:  { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  headerIcon:  { width: 40, height: 40, borderRadius: 12, backgroundColor: 'rgba(255,255,255,0.2)', justifyContent: 'center', alignItems: 'center' },
+  headerIcon:  { width: 48, height: 48, borderRadius: 14, backgroundColor: 'rgba(255,255,255,0.22)', borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.4)', justifyContent: 'center', alignItems: 'center' },
+  hdrStrip:     { flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: 'rgba(0,0,0,0.12)', paddingHorizontal: 16, paddingVertical: 8 },
+  hdrLiveDot:   { width: 7, height: 7, borderRadius: 4, backgroundColor: '#2ecc71' },
+  hdrStripText: { fontSize: 11, color: 'rgba(255,255,255,0.88)', fontWeight: '500', flex: 1 },
   headerTitle: { fontSize: 17, fontWeight: '900', color: '#fff' },
   headerSub:   { fontSize: 11, color: 'rgba(255,255,255,0.8)', marginTop: 1 },
   gpsBadge:    { flexDirection: 'row', alignItems: 'center', gap: 5, paddingHorizontal: 10, paddingVertical: 6, borderRadius: 12, borderWidth: 1, borderColor: 'rgba(255,255,255,0.3)' },
